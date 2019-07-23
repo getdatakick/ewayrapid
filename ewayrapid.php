@@ -71,6 +71,7 @@ class Ewayrapid extends PaymentModule
                 || !Configuration::updateValue('EWAYRAPID_PAYMENTTYPE', 'visa,mastercard')
                 || !Configuration::updateValue('EWAYRAPID_PAYMENTMETHOD', 'iframe')
                 || !$this->registerHook('payment')
+                || !$this->registerHook('displayPaymentEU')
                 || !$this->registerHook('paymentReturn')
                 || !$this->registerHook('backOfficeHeader')
                 || !$this->registerHook('displayHeader')) {
@@ -311,6 +312,21 @@ class Ewayrapid extends PaymentModule
     public function hookHeader()
     {
         $this->context->controller->addCSS(($this->_path).'views/css/front.css', 'all');
+    }
+
+    public function hookDisplayPaymentEU()
+    {
+        if (! $this->active) {
+            return;
+        }
+
+        return [
+            [
+                'cta_text' => $this->l('Pay with debit or credit card'),
+                'logo'     => Media::getMediaPath($this->local_path.'views/img/eway logo (gp) for white bkg_poster_.png'),
+                'action'   => $this->context->link->getModuleLink($this->name, 'eupayment', [], true),
+            ]
+        ];
     }
 
     public function hookPayment($params)
@@ -847,4 +863,5 @@ class Ewayrapid extends PaymentModule
             (int)$cart->id.'&key='.$customer->secure_key
         );
     }
+
 }
